@@ -1,3 +1,4 @@
+/*
 const inquirer = require ('inquirer');
 const Sales = require('./lib/sales');
 const Engineering = require('./lib/engineering');
@@ -207,3 +208,4 @@ class Team {
 
 const team = new Team()
 team.askUserInput() //start the questions 
+*/
