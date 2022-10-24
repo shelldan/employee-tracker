@@ -118,7 +118,7 @@ addDepartment = () => {
         })
 }
 
-/*
+
 addRole = ()=>{
     return inquirer
         .prompt ([
@@ -154,9 +154,11 @@ addRole = ()=>{
         })
 }
 
+
+
 addEmployee = () =>{
 
 }
-*/
+
 
 askUserInput()//start 
