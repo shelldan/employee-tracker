@@ -2,10 +2,10 @@ const cTable = require('console.table')
 const inquirer = require('inquirer')
 const {connection} = require('./connection/connection.js')
 
-// const departments = [] //to store department
-// const roles = [] //to store role
-// const employees = [] //to store employees 
-// const manager = [] //to store manager
+const departments = [] //to store department
+const roles = [] //to store role
+const employees = [] //to store employees 
+const manager = [] //to store manager
 
 askUserInput = () =>{
     return inquirer
@@ -159,10 +159,79 @@ addRole = ()=>{
 }
 
 
-
 addEmployee = () =>{
+    return inquirer
+        .prompt ([
+            {
+                type: 'input',
+                name: 'newFirstName',
+                message: "What is the employee's first name?",
+            },
+            {
+                type: 'input',
+                name: 'newLastName',
+                message: "What is the employee's last name?"
+            },
+            {
+                type: 'list',
+                name: 'selectRole',
+                message: "What is the employee's role?",
+                choices: roles
+            },
+            {
+                type: 'list',
+                name: 'selectManager',
+                message: "What is the employee's manager?",
+                choices: managers
+            }
+        ])
+        .then((answer)=>{
+            let query = ``;
+            let newEmployee = {answer.newFirstName, answer.newLastName, answer.selectRole, answer.selectManager}
+            connection.query(query, newEmployee, (err, result)=>{
+                if(err){
+                    console.log(err);
+                }
+                console.log(result);
+                viewAllEmployees()
+            })
+            askUserInput()
 
+        })
+}
+
+updateEmployeeRole(){
+    return inquirer
+        .prompt ([
+            {
+                type: 'list',
+                name: 'selectEmployee',
+                message: "Which employee's role do you want to update?",
+                choices: employees
+            },
+            {
+                type: 'list',
+                name: 'selectRole',
+                message: 'Which role do you want to assign the selected employee?',
+                choices: roles
+            }
+        ])
+        .then((answer)=>{
+            let query = ``;
+            let updateEmployee = {answer.selectEmployee, answer.selectRole}
+            connection.query(query, updateEmployee, (err, result)=>{
+                if(err){
+                    console.log(err);
+                }
+                console.log(result);
+                viewAllEmployees()
+            })
+            askUserInput()
+        })
 }
 
 
+quit = () =>{
+
+}
 askUserInput()//start 
