@@ -140,7 +140,11 @@ addRole = ()=>{
             }
         ])
         .then((answer)=>{
-            let query = ``;
+            let query = `INSERT INTO roles (title, department, salary)
+                         VALUES (? ? ?)
+                         FROM roles
+                         JOIN departments
+                         ON roles.department_id = departments.department_id`;
             let newRole = {answer.newRole, answer.newSalary, answer.selectDepartment}
             connection.query(query, newRole, (err, result) =>{
                 if(err){
