@@ -36,7 +36,6 @@ askUserInput = () =>{
             }else if(selectUserInput === 'Update Employee Role'){
                 updateEmployeeRole();
             }else if(selectUserInput === 'Quit'){
-                console.log(team)
                 quit();
             }
         })
@@ -141,11 +140,15 @@ addRole = ()=>{
         ])
         .then((answer)=>{
             let query = `INSERT INTO roles (title, department, salary)
-                         VALUES (? ? ?)
+                         VALUES (${answer.newRole},${answer.newSalary},${selectDepartment})
                          FROM roles
                          JOIN departments
                          ON roles.department_id = departments.department_id`;
-            let newRole = {answer.newRole, answer.newSalary, answer.selectDepartment}
+            let newRole = {
+                newRole: answer.newRole,
+                newSalary: answer.newSalary,
+                selectDepartment: answer.selectDepartment
+            }
             connection.query(query, newRole, (err, result) =>{
                 if(err){
                     console.log(err);
@@ -158,7 +161,7 @@ addRole = ()=>{
         })
 }
 
-
+/*
 addEmployee = () =>{
     return inquirer
         .prompt ([
@@ -234,4 +237,5 @@ updateEmployeeRole(){
 quit = () =>{
 
 }
+*/
 askUserInput()//start 
