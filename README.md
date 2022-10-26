@@ -1,12 +1,10 @@
 # Note Taker
 
 <p>
-    <img src="https://img.shields.io/badge/-HTML-red" />
-    <img src="https://img.shields.io/badge/-CSS-lightgrey" />
     <img src="https://img.shields.io/badge/-JavaScript-purple" />
     <img src="https://img.shields.io/badge/-Node-green" />
-    <img src="https://img.shields.io/badge/-Express-blue" />
-    <img src="https://img.shields.io/badge/-npm-yellow" />
+    <img src="https://img.shields.io/badge/-inquirer-blue" />
+    <img src="https://img.shields.io/badge/-MySQL-yellow" />
 </p>
 
 
@@ -14,7 +12,7 @@
 1. [Description](#description)
 2. [User Story](#user-story)
 3. [Screenshot](#screenshot)
-4. [Heroku](#heroku)
+4. [Video](#video)
 5. [Installation](#installation)
 6. [License](#license)
 7. [Contributing](#contributing)
@@ -22,38 +20,33 @@
 9. [Questions](#contact-information)
 
 ## Description
-The Note Taker can be used to write and save notes. This application will use HTML, CSS, and JavaScript front end to layout the application and will use an Express.js back end to save, retrieve and delete note from a JSON file. The application is deployed to [heroku](https://shelldan-note-taker.herokuapp.com/) as well. 
-
+To build a command-line application from scratch to manage a company's employee database, using Node.js, inquirer, and MySQL. 
 
 ## User Story
 ```md
-AS A small business owner
-I WANT to be able to write and save notes
-SO THAT I can organize my thoughts and keep track of tasks I need to complete
+AS A business owner
+I WANT to be able to view and manage the departments, roles, and employees in my company
+SO THAT I can organize and plan my business
 ```
 
 ## Screenshot
-![](images/note-taker-homepage.png)
+![](assets/screenshot-1.png)
 
-![](images/note-taker-retrieve.png)
+![](assets/screenshot-2.png)
 
-![](images/note-taker-post.png)
+![](assets/screenshot-3.png)
 
-
-
-## Heroku
-https://shelldan-note-taker.herokuapp.com/
+## Video
+Check out the [walk-through video](https://drive.google.com/file/d/16irVHKnwhGI9ElGUJyabWoP_k2vuarCg/view?usp=sharing).
 
 ## Installation
 To clone the repo:
 ```
-git clone https://github.com/shelldan/node-taker.git
+git clone https://github.com/shelldan/employee-tracker.git
 ``` 
 Run 'npm install' to install dependencies
 
-Run 'npm run develop' to start the program
-
-App listening at http://localhost:3001 
+Run 'node index.js' to start the program
 
 ---
 
@@ -76,13 +69,29 @@ Following a code review, your feature will be merged.
 ## Test:
 It is recommended that you follow this workflow:
 
-1. When you open the Note Taker, then you should be presented with a landing page with a link to a notes page
-2. When you click on the link to the notes page, you should be presented with a page with existing notes listed in the left-hand column, plus empty fields to enter a new note title and the note's text in the right-hand column
-3. When you enter a new note title and the note's text, then a Save icon appears in the navigation at the top of the page
-4. When you click on the Save icon, then the new note you have entered is saved and appears in the left-hand column with the other existing notes
-5. When you click on an existing note in the list in the left-hand column, then that note appears in the right-hand column
-6. When you click on the Write icon in the navigation at top of the page, then you should be presented with empty fields to enter a new note title and the note's text in the right hand column.
-7. When you click on the Delete icon, then the note you have deleted is removed from the left-hand column
+```
+GIVEN a command-line application that accepts user input
+WHEN I start the application
+THEN I am presented with the following options: view all departments, view all roles, view all employees, add a department, add a role, add an employee, and update an employee role
+WHEN I choose to view all departments
+THEN I am presented with a formatted table showing department names and department ids
+WHEN I choose to view all roles
+THEN I am presented with the job title, role id, the department that role belongs to, and the salary for that role
+WHEN I choose to view all employees
+THEN I am presented with a formatted table showing employee data, including employee ids, first names, last names, job titles, departments, salaries, and managers that the employees report to
+WHEN I choose to add a department
+THEN I am prompted to enter the name of the department and that department is added to the database
+WHEN I choose to add a role
+THEN I am prompted to enter the name, salary, and department for the role and that role is added to the database
+WHEN I choose to add an employee
+THEN I am prompted to enter the employee’s first name, last name, role, and manager, and that employee is added to the database
+WHEN I choose to update an employee role
+THEN I am prompted to select an employee to update and their new role and this information is updated in the database 
+WHEN I choose to remove an employee
+THEN I am prompted to select an employee to remove
+WHEN I choose to view department budget
+THEN I am presented with a formatted table showing department id, department name, and salary. 
+```
 
 ---
 
