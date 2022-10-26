@@ -1,6 +1,6 @@
 const cTable = require('console.table')
 const inquirer = require('inquirer')
-const {connection} = require('./connection/connection.js')
+const {connection} = require('./config/connection.js')
 
 const departments = [] //to store department
 const roles = [] //to store role
@@ -11,7 +11,7 @@ askUserInput = () =>{
     return inquirer
         .prompt([
             {
-                type:'list',
+                type:'rawlist',
                 name:'selectUserInput',
                 message:'What would you like to do?',
                 choices: ['View All Departments','View All Roles','View All Employees','Add Department','Add Role', 'Add Employee','Update Employee Role','Quit']
@@ -36,19 +36,25 @@ askUserInput = () =>{
             }else if(selectUserInput === 'Update Employee Role'){
                 updateEmployeeRole();
             }else if(selectUserInput === 'Quit'){
-                quit();
+                connection.end();
             }
         })
 }
 
 viewAllDepartments = () =>{
+    //console.log('Department Table\n')
     let query = `SELECT * FROM departments`
     connection.query(query, (err,result) => {
         if(err){
             console.log(err);
         }
-
+        console.log(` `);
+        console.log(`=================================================================================================`)
+        console.log(`                                  All Employees`)
         console.table(result);
+        console.log('=================================================================================================')
+        console.log(` `)
+        askUserInput()
     });
 
 };
@@ -64,7 +70,13 @@ viewAllRoles = () => {
             console.log(err);
         }
 
+        console.log(` `);
+        console.log(`=================================================================================================`)
+        console.log(`                                  All Employees`)
         console.table(result);
+        console.log('=================================================================================================')
+        console.log(` `)
+        askUserInput()
     });
 };
 
@@ -89,7 +101,13 @@ viewAllEmployees = () => {
             console.log(err);
         }
 
+        console.log(` `);
+        console.log(`=================================================================================================`)
+        console.log(`                                  All Employees`)
         console.table(result);
+        console.log('=================================================================================================')
+        console.log(` `)
+        askUserInput()
     });
 };
 
@@ -111,6 +129,7 @@ addDepartment = () => {
                 }
                 console.log(result)
                 viewAllDepartments();
+                
             })
 
             askUserInput();
@@ -140,16 +159,16 @@ addRole = ()=>{
         ])
         .then((answer)=>{
             let query = `INSERT INTO roles (title, department, salary)
-                         VALUES (${answer.newRole},${answer.newSalary},${selectDepartment})
+                         VALUES (${answer.newRole}, ${answer.newSalary}, ${answer.selectDepartment})
                          FROM roles
                          JOIN departments
                          ON roles.department_id = departments.department_id`;
-            let newRole = {
-                newRole: answer.newRole,
-                newSalary: answer.newSalary,
-                selectDepartment: answer.selectDepartment
-            }
-            connection.query(query, newRole, (err, result) =>{
+            // let newRole = {
+            //     newRole: answer.newRole,
+            //     newSalary: answer.newSalary,
+            //     selectDepartment: answer.selectDepartment
+            // }
+            connection.query(query, (err, result) =>{
                 if(err){
                     console.log(err);
                 }
@@ -161,7 +180,7 @@ addRole = ()=>{
         })
 }
 
-/*
+
 addEmployee = () =>{
     return inquirer
         .prompt ([
@@ -189,21 +208,34 @@ addEmployee = () =>{
             }
         ])
         .then((answer)=>{
-            let query = ``;
-            let newEmployee = {answer.newFirstName, answer.newLastName, answer.selectRole, answer.selectManager}
-            connection.query(query, newEmployee, (err, result)=>{
+            let query = `INSERT INTO employees (employees.first_name, employees.last_name, roles.title, manager)
+                         VALUE (${answer.newFirstName}, ${answer.newLastName}, ${answer.selectRole}, ${answer.selectManager})
+                         FROM employees
+                         LEFT JOIN employees manager
+                         ON manager.employee_id = employees.manager_id
+                         LEFT JOIN roles
+                         ON employees.role_id = roles.role_id
+                         LEFT JOIN departments
+                         ON roles.department_id = departments.department_id`;
+            // let newEmployee = {
+            //     newFirstName: answer.newFirstName, 
+            //     newLastName: answer.newLastName, 
+            //     selectRole: answer.selectRole, 
+            //     selectManager: answer.selectManager
+            // }
+            connection.query(query, (err, result)=>{
                 if(err){
                     console.log(err);
                 }
                 console.log(result);
                 viewAllEmployees()
             })
+            
             askUserInput()
-
         })
 }
 
-updateEmployeeRole(){
+updateEmployeeRole=()=>{
     return inquirer
         .prompt ([
             {
@@ -220,9 +252,23 @@ updateEmployeeRole(){
             }
         ])
         .then((answer)=>{
-            let query = ``;
-            let updateEmployee = {answer.selectEmployee, answer.selectRole}
-            connection.query(query, updateEmployee, (err, result)=>{
+            let query = `SELECT
+                            ${answer.selectEmployees.firstName}
+                            ${answer.selectEmployees.lastName}
+                         From 
+                            employees
+                         WHERE
+                            employees.employee_id = ${answer.selectRole}
+                         UPDATE employees
+                         SET
+                            employees.roles = ${answer.selectRole}
+                         WHERE 
+                            employees.employee_id = ${answer.selectRole}`;
+
+            // let updateEmployee = {
+            //     selectEmployee: answer.selectEmployee, 
+            //     selectRole: answer.selectRole}
+            connection.query(query, (err, result)=>{
                 if(err){
                     console.log(err);
                 }
@@ -234,8 +280,4 @@ updateEmployeeRole(){
 }
 
 
-quit = () =>{
-
-}
-*/
 askUserInput()//start 
