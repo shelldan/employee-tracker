@@ -2,10 +2,10 @@ const cTable = require('console.table')
 const inquirer = require('inquirer')
 const {connection} = require('./config/connection.js')
 
-const departments = [] //to store department
-const roles = [] //to store role
-const employees = [] //to store employees 
-const manager = [] //to store manager
+let departmentsArray = [] //to store department
+let roles = [] //to store role
+let employees = [] //to store employees 
+let manager = [] //to store manager
 
 askUserInput = () =>{
     return inquirer
@@ -20,13 +20,10 @@ askUserInput = () =>{
         .then(({selectUserInput})=>{
             if(selectUserInput === 'View All Departments'){
                 viewAllDepartments();
-                askUserInput();
             }else if(selectUserInput === 'View All Roles'){
                 viewAllRoles();
-                askUserInput();
             }else if(selectUserInput === 'View All Employees'){
                 viewAllEmployees();
-                askUserInput();
             }else if(selectUserInput === 'Add Department'){
                 addDepartment();
             }else if(selectUserInput === 'Add Role'){
@@ -127,57 +124,65 @@ addDepartment = () => {
                 if(err){
                     console.log(err);
                 }
-                console.log(result)
+                //console.log(result)
                 viewAllDepartments();
                 
             })
-
-            askUserInput();
         })
 }
 
-
-addRole = ()=>{
-    return inquirer
-        .prompt ([
+addRole = () =>{
+    connection.query(`SELECT * FROM departments`,(err, res)=>{
+        if(err){
+            console.log(err);
+        }
+        departmentsArray = res.map(dept => (
             {
-                type: 'input',
-                name: 'newRole',
-                message: 'What is the name of the role?'
-            },
-            {
-                type: 'input',
-                name: 'newSalary',
-                message: 'What is the salary of the role?'
-            },
-            {
-                type: 'List',
-                name: 'selectDepartment',
-                message: 'Which department does the role belong to?',
-                choices: departments
+                name: dept.department_id,
+                value: dept.department
             }
-        ])
-        .then((answer)=>{
-            let query = `INSERT INTO roles (title, department, salary)
-                         VALUES (${answer.newRole}, ${answer.newSalary}, ${answer.selectDepartment})
-                         FROM roles
-                         JOIN departments
-                         ON roles.department_id = departments.department_id`;
-            // let newRole = {
-            //     newRole: answer.newRole,
-            //     newSalary: answer.newSalary,
-            //     selectDepartment: answer.selectDepartment
-            // }
-            connection.query(query, (err, result) =>{
-                if(err){
-                    console.log(err);
+        ))
+    
+        return inquirer
+            .prompt ([
+                {
+                    type: 'input',
+                    name: 'newRole',
+                    message: 'What is the name of the role?'
+                },
+                {
+                    type: 'input',
+                    name: 'newSalary',
+                    message: 'What is the salary of the role?'
+                },
+                {
+                    type: 'List',
+                    name: 'selectDepartment',
+                    message: 'Which department does the role belong to?',
+                    choices: departmentsArray
                 }
-                console.log(result)
-                viewAllRoles();
+            ])
+            .then((answer)=>{
+                let query = `INSERT INTO roles (title, department, salary)
+                            VALUES (${answer.newRole}, ${answer.newSalary}, ${answer.selectDepartment})
+                            FROM roles
+                            JOIN departments
+                            ON roles.department_id = departments.department_id`;
+                // let newRole = {
+                //     newRole: answer.newRole,
+                //     newSalary: answer.newSalary,
+                //     selectDepartment: answer.selectDepartment
+                // }
+                connection.query(query, (err, result) =>{
+                    if(err){
+                        console.log(err);
+                    }
+                    //console.log(result)
+                    viewAllRoles();
+                })
             })
 
-            askUserInput();
-        })
+    })
 }
 
 
