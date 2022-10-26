@@ -164,17 +164,9 @@ addRole = () =>{
                 }
             ])
             .then((answer)=>{
-                let query = `INSERT INTO roles (title, department, salary)
-                             VALUES (${answer.newRole}, ${answer.newSalary}, ${answer.selectDepartment})
-                             FROM roles
-                             JOIN departments
-                             ON roles.department_id = departments.department_id`;
-                // let newRole = {
-                //     newRole: answer.newRole,
-                //     newSalary: answer.newSalary,
-                //     selectDepartment: answer.selectDepartment
-                // }
-                connection.query(query, (err, result) =>{
+                let sql = `INSERT INTO roles (title, department, salary) VALUES (?, ?, ?)`
+                let params = [answer.newRole, answer.selectDepartment, answer.newSalary]
+                connection.query(sql, params, (err, result) =>{
                     if(err){
                         console.log(err);
                     }
