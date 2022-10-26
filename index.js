@@ -2,10 +2,10 @@ const cTable = require('console.table')
 const inquirer = require('inquirer')
 const {connection} = require('./config/connection.js')
 
-let departmentsArray = [] //to store department
-let rolesArray = [] //to store role
-let employeesArray = [] //to store employees 
-let managersArray = [] //to store manager
+// let departmentsArray = [] //to store department
+// let rolesArray = [] //to store role
+// let employeesArray = [] //to store employees 
+// let managersArray = [] //to store manager
 
 askUserInput = () =>{
     return inquirer
@@ -14,7 +14,7 @@ askUserInput = () =>{
                 type:'rawlist',
                 name:'selectUserInput',
                 message:'What would you like to do?',
-                choices: ['View All Departments','View All Roles','View All Employees','Add Department','Add Role', 'Add Employee','Update Employee Role','Quit']
+                choices: ['View All Departments','View All Roles','View All Employees','Add Department','Add Role', 'Add Employee','Update Employee Role', 'View department budget', 'Remove employee','Quit']
             }
         ])
         .then(({selectUserInput})=>{
@@ -32,8 +32,12 @@ askUserInput = () =>{
                 addEmployee();
             }else if(selectUserInput === 'Update Employee Role'){
                 updateEmployeeRole();
+            }else if(selectUserInput === 'View department budget'){
+                viewDepartmentBudget();
+            }else if(selectUserInput === 'Remove employee'){
+                removeEmployee();
             }else if(selectUserInput === 'Quit'){
-                connection.end();
+                connection.end()
             }
         })
 }
@@ -118,9 +122,9 @@ addDepartment = () => {
             }
         ])
         .then((answer)=>{
-            let query = `INSERT INTO departments (department) VALUES (?)`;
-            let newDepartment = answer.newDepartment
-            connection.query(query, newDepartment, (err, result) =>{
+            let sql = `INSERT INTO departments (department) VALUES (?)`;
+            let params = answer.newDepartment
+            connection.query(sql, params, (err, result) =>{
                 if(err){
                     console.log(err);
                 }
@@ -179,7 +183,6 @@ addRole = () =>{
 
     })
 }
-
 
 addEmployee = () =>{
     connection.query(`SELECT 
@@ -255,8 +258,14 @@ addEmployee = () =>{
                 }
             ])
             .then((answer)=>{
-                let sql = `INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES (? ? ? ?)`;
-                let params = [answer.newFirstName, answer.newLastName, answer.selectRole, answer.selectManager]
+                let sql = `INSERT INTO employees SET ?`;
+                let params = {
+                    first_name: answer.newFirstName,
+                    last_name: answer.newLastName,
+                    role_id: answer.selectRole,
+                    manager_id: answer.selectManager
+                }
+                console.log(answer)
                 console.log(params)
                 console.log(answer.selectRole,answer.selectManager)
                 // let newEmployee = {
@@ -276,47 +285,96 @@ addEmployee = () =>{
 }
 
 updateEmployeeRole=()=>{
-    return inquirer
-        .prompt ([
-            {
-                type: 'list',
-                name: 'selectEmployee',
-                message: "Which employee's role do you want to update?",
-                choices: employeesArray
-            },
-            {
-                type: 'list',
-                name: 'selectRole',
-                message: 'Which role do you want to assign the selected employee?',
-                choices: rolesArray
-            }
-        ])
-        .then((answer)=>{
-            let query = `SELECT
-                            ${answer.selectEmployees.firstName}
-                            ${answer.selectEmployees.lastName}
-                         From 
-                            employees
-                         WHERE
-                            employees.employee_id = ${answer.selectRole}
-                         UPDATE employees
-                         SET
-                            employees.roles = ${answer.selectRole}
-                         WHERE 
-                            employees.employee_id = ${answer.selectRole}`;
+    connection.query(`SELECT 
+                    employees.employee_id, 
+                    employees.first_name, 
+                    employees.last_name,
+                    employees.role_id,
+                    roles.title,
+                    employees.manager_id,
+                    departments.department,
+                    roles.salary,
+                    CONCAT(manager.first_name, ' ', manager.last_name) AS manager
+                    FROM employees 
+                    LEFT JOIN employees manager
+                    ON manager.employee_id = employees.manager_id
+                    LEFT JOIN roles
+                    ON employees.role_id = roles.role_id
+                    LEFT JOIN departments 
+                    ON roles.department_id = departments.department_id;`,(err, res)=>{
+    if(err){
+        console.log(err);
+    }
 
-            // let updateEmployee = {
-            //     selectEmployee: answer.selectEmployee, 
-            //     selectRole: answer.selectRole}
-            connection.query(query, (err, result)=>{
-                if(err){
-                    console.log(err);
+    console.log(res)
+
+    employeesArray = res.map(emp =>(
+        {
+            name: emp.first_name.concat(' ',emp.last_name),
+            value: emp.employee_id
+        }
+    ))
+
+    rolesArray = res.map(role =>(
+        {
+            name: role.title,
+            value: role.role_id,
+        }
+    ))            
+
+    managersArray = res.map(manager=>(
+        {
+            name: manager.manager,
+            value: manager.manager_id,
+        }
+    )).filter(manager => {return manager !== null})
+    
+        return inquirer
+            .prompt ([
+                {
+                    type: 'list',
+                    name: 'selectEmployee',
+                    message: "Which employee's role do you want to update?",
+                    choices: employeesArray
+                },
+                {
+                    type: 'list',
+                    name: 'selectRole',
+                    message: 'Which role do you want to assign the selected employee?',
+                    choices: rolesArray
                 }
-                console.log(result);
-                viewAllEmployees()
+            ])
+            .then((answer)=>{
+                let query = `SELECT
+                                ${answer.selectEmployees.firstName}
+                                ${answer.selectEmployees.lastName}
+                            From 
+                                employees
+                            WHERE
+                                employees.employee_id = ${answer.selectRole}
+                            UPDATE employees
+                            SET
+                                employees.roles = ${answer.selectRole}
+                            WHERE 
+                                employees.employee_id = ${answer.selectRole}`;
+
+                connection.query(query, (err, result)=>{
+                    if(err){
+                        console.log(err);
+                    }
+                    console.log(result);
+                    viewAllEmployees()
             })
         })
+    })
 }
 
+viewDepartmentBudget=()=>{
+
+}
+
+removeEmployee =()=>{
+
+}
 
 askUserInput()//start 
