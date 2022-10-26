@@ -14,7 +14,7 @@ askUserInput = () =>{
                 type:'rawlist',
                 name:'selectUserInput',
                 message:'What would you like to do?',
-                choices: ['View All Departments','View All Roles','View All Employees','Add Department','Add Role', 'Add Employee','Update Employee Role', 'View department budget', 'Remove employee','Quit']
+                choices: ['View All Departments','View All Roles','View All Employees','Add Department','Add Role', 'Add Employee','Update Employee Role', 'Remove employee', 'View department budget', 'Quit']
             }
         ])
         .then(({selectUserInput})=>{
@@ -43,7 +43,6 @@ askUserInput = () =>{
 }
 
 viewAllDepartments = () =>{
-    //console.log('Department Table\n')
     let query = `SELECT * FROM departments`
     connection.query(query, (err,result) => {
         if(err){
@@ -139,7 +138,7 @@ addRole = () =>{
         if(err){
             console.log(err);
         }
-        console.log(res)
+        //console.log(res)
         departmentsArray = res.map(dept => (
             {
                 name: dept.department,
@@ -147,7 +146,7 @@ addRole = () =>{
             }
 
         ))
-        console.log(departmentsArray)
+        //console.log(departmentsArray)
         return inquirer
             .prompt ([
                 {
@@ -168,11 +167,11 @@ addRole = () =>{
                 }
             ])
             .then((answer)=>{
-                let sql = `INSERT INTO roles (title, department_id, salary) VALUES (?, ?, ?)`
+                let query = `INSERT INTO roles (title, department_id, salary) VALUES (?, ?, ?)`
                 let params = [answer.newRole, answer.selectDepartment, answer.newSalary]
-                console.log(params)
-                console.log(answer.selectDepartment)
-                connection.query(sql, params, (err, result) =>{
+                //console.log(params)
+                //console.log(answer.selectDepartment)
+                connection.query(query, params, (err, result) =>{
                     if(err){
                         console.log(err);
                     }
@@ -189,7 +188,7 @@ addEmployee = () =>{
         if(err){
             console.log(err);
         }
-        console.log(res)
+        //console.log(res)
 
         employeesArray = res.map(emp =>(
             {
@@ -214,9 +213,9 @@ addEmployee = () =>{
                     value: role.role_id,
                 }
             ))      
-            console.log(employeesArray)
-            console.log(rolesArray)
-            console.log(managersArray)
+            //console.log(employeesArray)
+            //console.log(rolesArray)
+            //console.log(managersArray)
         
             return inquirer
                 .prompt ([
@@ -244,17 +243,17 @@ addEmployee = () =>{
                     }
                 ])
                 .then((answer)=>{
-                    let sql = `INSERT INTO employees SET ?`;
+                    let query = `INSERT INTO employees SET ?`;
                     let params = {
                         first_name: answer.newFirstName,
                         last_name: answer.newLastName,
                         role_id: answer.selectRole,
                         manager_id: answer.selectManager
                     }
-                    console.log(answer)
-                    console.log(params)
-                    console.log(answer.selectRole,answer.selectManager)
-                    connection.query(sql, params, (err, result)=>{
+                    //console.log(answer)
+                    //console.log(params)
+                    //console.log(answer.selectRole,answer.selectManager)
+                    connection.query(query, params, (err, result)=>{
                         if(err){
                             console.log(err);
                         }
@@ -271,7 +270,7 @@ updateEmployeeRole=()=>{
             console.log(err);
         }
 
-        console.log(res)
+        //console.log(res)
 
         employeesArray = res.map(emp =>(
             {
@@ -290,8 +289,8 @@ updateEmployeeRole=()=>{
                     value: role.role_id,
                 }
             ))
-            console.log(employeesArray)     
-            console.log(rolesArray)       
+            //console.log(employeesArray)     
+            //console.log(rolesArray)       
             
             return inquirer
                 .prompt ([
@@ -309,10 +308,10 @@ updateEmployeeRole=()=>{
                     }
                 ])
                 .then((answer)=>{
-                    let sql = `UPDATE employees SET role_id = ${answer.selectRole} WHERE employee_id = ${answer.selectEmployee}`
-                    console.log('I made it here')
-                    console.log(answer)
-                    connection.query(sql, (err, res)=>{
+                    let query = `UPDATE employees SET role_id = ${answer.selectRole} WHERE employee_id = ${answer.selectEmployee}`
+                    //console.log('I made it here')
+                    //console.log(answer)
+                    connection.query(query, (err, res)=>{
                         if(err){
                             console.log(err);
                         }
@@ -323,19 +322,6 @@ updateEmployeeRole=()=>{
             
         })
     })
-}
-
-viewDepartmentBudget=()=>{
-    connection.query(`SELECT roles.role_id, roles.title, roles.salary, roles.department_id, departments.department, SUM(roles.salary)
-                      FROM roles 
-                      JOIN departments 
-                      ON roles.department_id = departments.department_id
-                      GROUP BY roles.department_id`,(err, res)=>{
-        if(err){
-            console.log(err)
-        }
-        console.table(res)
-    })    
 }
 
 removeEmployee =()=>{
@@ -361,18 +347,39 @@ removeEmployee =()=>{
                 }
             ])
             .then((answer)=>{
-                console.log(answer)
+                //console.log(answer)
                 let sql = `DELETE FROM employees WHERE employee_id = ${answer.removeEmployee}`
                 connection.query(sql, (err, res)=>{
                     if(err){
                         console.log(err)
                     }
-                    console.log(res)
+                    //console.log(res)
                     viewAllEmployees()
                 })
             })
     })
 
+}
+
+viewDepartmentBudget=()=>{
+    let query =(`SELECT departments.department_id, departments.department, SUM(roles.salary)
+                 FROM roles 
+                 JOIN departments 
+                 ON roles.department_id = departments.department_id
+                 GROUP BY roles.department_id`)
+    connection.query(query, (err, res)=>{
+        if(err){
+            console.log(err)
+        }
+
+        console.log(` `)
+        console.log(`=================================================================================================`)
+        console.log(`                                  Budgets`)
+        console.table(res)
+        console.log('=================================================================================================')
+        console.log(` `)
+        askUserInput()
+    })   
 }
 
 askUserInput()//start 
