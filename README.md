@@ -1,4 +1,4 @@
-# Note Taker
+# Employee-Tracker
 
 <p>
     <img src="https://img.shields.io/badge/-JavaScript-purple" />
@@ -20,7 +20,7 @@
 9. [Questions](#contact-information)
 
 ## Description
-To build a command-line application from scratch to manage a company's employee database, using Node.js, inquirer, and MySQL. 
+Employee-Tracker is a back-end application to manage a company's employee database, using Node.js, inquirer, and MySQL. 
 
 ## User Story
 ```md
