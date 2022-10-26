@@ -147,6 +147,43 @@ addRole = () =>{
 
         ))
         //console.log(departmentsArray)
+
+        /**
+         * When selecting 'Which department does the role belong to?' it shows name(Sales, Engineering, Finance, Legal), and once done selecting, it returns value(1,2,3,4)
+         * 
+         * It'd seem that when you pass inquirer an array of objects as a parameter for it's choices, it looks for a name field, and assumes that is what you want to display there. It also looks like there is some baked in stuff to interact with the field name of value, where that's what is gives as the actual value.
+         * 
+         * So how to test it?
+         * If there isn't a name field present it looks like it defaults to showing the value field, and if neither are present then it returns undefined.
+         * 
+         * 1) there isn't a name field present, when it ask'Which department does the role belong to?', it will shows (1, 2, 3, 4)
+         * departmentsArray = res.map(dept => (
+         *      {
+         *              test_name: dept.department,
+         *              value: dept.department_id
+         *      }
+         * ))
+         * 
+         * 2) if neither are present (no 'name' and 'value'), it returns 'undefined' when it ask 'Which department does the role belong to'
+         * departmentsArray = res.map(dept => (
+         *      {
+         *              test_name: dept.department,
+         *              test_value: dept.department_id
+         *      }
+         * ))
+         * 
+         * 3) if there isn't a value filed present, when it ask 'Which department does the role belong to?, it will shows (Sales, Engineering, Finance, Legal), and once done selecting, it returns values (Sales)
+         * departmentsArray = res.map(dept => (
+         *      {
+         *              name: dept.department,
+         *              test_value: dept.department_id
+         *      }
+         * ))         
+         * 
+         * Looks like it is just inquirer assuming if you have a name field, then you would want that to display on choices, and if you have a value field then you would want that to be the value that is passed based off of your choice. If the the value field isn't there, then it selects the name of the thing that was selected, and again if neither are there, then the result is undefined.
+         * 
+         */
+        
         return inquirer
             .prompt ([
                 {
