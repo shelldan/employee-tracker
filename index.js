@@ -2,10 +2,10 @@ const cTable = require('console.table')
 const inquirer = require('inquirer')
 const {connection} = require('./config/connection.js')
 
-// let departmentsArray = [] //to store department
-// let rolesArray = [] //to store role
-// let employeesArray = [] //to store employees 
-// let managersArray = [] //to store manager
+let departmentsArray = [] //to store department
+let rolesArray = [] //to store role
+let employeesArray = [] //to store employees 
+let managersArray = [] //to store manager
 
 askUserInput = () =>{
     return inquirer
@@ -185,23 +185,7 @@ addRole = () =>{
 }
 
 addEmployee = () =>{
-    connection.query(`SELECT 
-                      employees.employee_id, 
-                      employees.first_name, 
-                      employees.last_name,
-                      employees.role_id,
-                      roles.title,
-                      employees.manager_id,
-                      departments.department,
-                      roles.salary,
-                      CONCAT(manager.first_name, ' ', manager.last_name) AS manager
-                      FROM employees 
-                      LEFT JOIN employees manager
-                      ON manager.employee_id = employees.manager_id
-                      LEFT JOIN roles
-                      ON employees.role_id = roles.role_id
-                      LEFT JOIN departments 
-                      ON roles.department_id = departments.department_id;`,(err, res)=>{
+    connection.query(`SELECT * FROM employees;`,(err, res)=>{
         if(err){
             console.log(err);
         }
@@ -213,167 +197,181 @@ addEmployee = () =>{
                 value: emp.employee_id
             }
         ))
-
-        rolesArray = res.map(role =>(
-            {
-                name: role.title,
-                value: role.role_id,
+        
+        res.forEach(record =>{
+            if(record.manager_id === null){
+                managersArray.push ({name: record.first_name.concat(' ', record.last_name), value: record.employee_id})
             }
-        ))            
+        })
 
-        managersArray = res.map(manager=>(
-            {
-                name: manager.manager,
-                value: manager.manager_id,
+        connection.query(`SELECT * FROM roles`,(err, res)=>{
+            if(err){
+                console.log(err)
             }
-        )).filter(manager => {return manager !== null})
-
-        console.log(employeesArray)
-        console.log(rolesArray)
-        console.log(managersArray)
-    
-        return inquirer
-            .prompt ([
+            rolesArray = res.map(role =>(
                 {
-                    type: 'input',
-                    name: 'newFirstName',
-                    message: "What is the employee's first name?",
-                },
-                {
-                    type: 'input',
-                    name: 'newLastName',
-                    message: "What is the employee's last name?"
-                },
-                {
-                    type: 'list',
-                    name: 'selectRole',
-                    message: "What is the employee's role?",
-                    choices: rolesArray
-                },
-                {
-                    type: 'list',
-                    name: 'selectManager',
-                    message: "What is the employee's manager?",
-                    choices: managersArray
+                    name: role.title,
+                    value: role.role_id,
                 }
-            ])
-            .then((answer)=>{
-                let sql = `INSERT INTO employees SET ?`;
-                let params = {
-                    first_name: answer.newFirstName,
-                    last_name: answer.newLastName,
-                    role_id: answer.selectRole,
-                    manager_id: answer.selectManager
-                }
-                console.log(answer)
-                console.log(params)
-                console.log(answer.selectRole,answer.selectManager)
-                // let newEmployee = {
-                //     newFirstName: answer.newFirstName, 
-                //     newLastName: answer.newLastName, 
-                //     selectRole: answer.selectRole, 
-                //     selectManager: answer.selectManager
-                // }
-                connection.query(sql, params, (err, result)=>{
-                    if(err){
-                        console.log(err);
+            ))      
+            console.log(employeesArray)
+            console.log(rolesArray)
+            console.log(managersArray)
+        
+            return inquirer
+                .prompt ([
+                    {
+                        type: 'input',
+                        name: 'newFirstName',
+                        message: "What is the employee's first name?",
+                    },
+                    {
+                        type: 'input',
+                        name: 'newLastName',
+                        message: "What is the employee's last name?"
+                    },
+                    {
+                        type: 'list',
+                        name: 'selectRole',
+                        message: "What is the employee's role?",
+                        choices: rolesArray
+                    },
+                    {
+                        type: 'list',
+                        name: 'selectManager',
+                        message: "What is the employee's manager?",
+                        choices: managersArray
                     }
-                    viewAllEmployees()
+                ])
+                .then((answer)=>{
+                    let sql = `INSERT INTO employees SET ?`;
+                    let params = {
+                        first_name: answer.newFirstName,
+                        last_name: answer.newLastName,
+                        role_id: answer.selectRole,
+                        manager_id: answer.selectManager
+                    }
+                    console.log(answer)
+                    console.log(params)
+                    console.log(answer.selectRole,answer.selectManager)
+                    connection.query(sql, params, (err, result)=>{
+                        if(err){
+                            console.log(err);
+                        }
+                        viewAllEmployees()
+                    })
                 })
-            })
+        })
     })
 }
 
 updateEmployeeRole=()=>{
-    connection.query(`SELECT 
-                    employees.employee_id, 
-                    employees.first_name, 
-                    employees.last_name,
-                    employees.role_id,
-                    roles.title,
-                    employees.manager_id,
-                    departments.department,
-                    roles.salary,
-                    CONCAT(manager.first_name, ' ', manager.last_name) AS manager
-                    FROM employees 
-                    LEFT JOIN employees manager
-                    ON manager.employee_id = employees.manager_id
-                    LEFT JOIN roles
-                    ON employees.role_id = roles.role_id
-                    LEFT JOIN departments 
-                    ON roles.department_id = departments.department_id;`,(err, res)=>{
-    if(err){
-        console.log(err);
-    }
-
-    console.log(res)
-
-    employeesArray = res.map(emp =>(
-        {
-            name: emp.first_name.concat(' ',emp.last_name),
-            value: emp.employee_id
+    connection.query(`SELECT * FROM employees`,(err, res)=>{
+        if(err){
+            console.log(err);
         }
-    ))
 
-    rolesArray = res.map(role =>(
-        {
-            name: role.title,
-            value: role.role_id,
-        }
-    ))            
+        console.log(res)
 
-    managersArray = res.map(manager=>(
-        {
-            name: manager.manager,
-            value: manager.manager_id,
-        }
-    )).filter(manager => {return manager !== null})
-    
-        return inquirer
-            .prompt ([
+        employeesArray = res.map(emp =>(
+            {
+                name: emp.first_name.concat(' ',emp.last_name),
+                value: emp.employee_id
+            }
+        ))
+
+        connection.query('SELECT * FROM roles',(err, res)=>{
+            if(err){
+                console.log(err)
+            }
+            rolesArray = res.map(role =>(
                 {
-                    type: 'list',
-                    name: 'selectEmployee',
-                    message: "Which employee's role do you want to update?",
-                    choices: employeesArray
-                },
-                {
-                    type: 'list',
-                    name: 'selectRole',
-                    message: 'Which role do you want to assign the selected employee?',
-                    choices: rolesArray
+                    name: role.title,
+                    value: role.role_id,
                 }
-            ])
-            .then((answer)=>{
-                let query = `SELECT
-                                ${answer.selectEmployees.firstName}
-                                ${answer.selectEmployees.lastName}
-                            From 
-                                employees
-                            WHERE
-                                employees.employee_id = ${answer.selectRole}
-                            UPDATE employees
-                            SET
-                                employees.roles = ${answer.selectRole}
-                            WHERE 
-                                employees.employee_id = ${answer.selectRole}`;
-
-                connection.query(query, (err, result)=>{
-                    if(err){
-                        console.log(err);
+            ))
+            console.log(employeesArray)     
+            console.log(rolesArray)       
+            
+            return inquirer
+                .prompt ([
+                    {
+                        type: 'list',
+                        name: 'selectEmployee',
+                        message: "Which employee's role do you want to update?",
+                        choices: employeesArray
+                    },
+                    {
+                        type: 'list',
+                        name: 'selectRole',
+                        message: 'Which role do you want to assign the selected employee?',
+                        choices: rolesArray
                     }
-                    console.log(result);
-                    viewAllEmployees()
+                ])
+                .then((answer)=>{
+                    let sql = `UPDATE employees SET role_id = ${answer.selectRole} WHERE employee_id = ${answer.selectEmployee}`
+                    console.log('I made it here')
+                    console.log(answer)
+                    connection.query(sql, (err, res)=>{
+                        if(err){
+                            console.log(err);
+                        }
+                        console.log(res);
+                        viewAllEmployees()
+                    })
             })
+            
         })
     })
 }
 
 viewDepartmentBudget=()=>{
-
+    connection.query(`SELECT roles.role_id, roles.title, roles.salary, roles.department_id, departments.department, SUM(roles.salary)
+                      FROM roles 
+                      JOIN departments 
+                      ON roles.department_id = departments.department_id
+                      GROUP BY roles.department_id`,(err, res)=>{
+        if(err){
+            console.log(err)
+        }
+        console.table(res)
+    })    
 }
 
 removeEmployee =()=>{
+    connection.query(`SELECT * FROM employees`,(err, res)=>{
+        if(err){
+            console.log(err)
+        }
+
+        employeesArray = res.map(emp =>(
+            {
+                name: emp.first_name.concat(' ',emp.last_name),
+                value: emp.employee_id
+            }
+        ))
+
+        return inquirer
+            .prompt ([
+                {
+                    type: 'list',
+                    name: 'removeEmployee',
+                    message: 'Which employee you want to remove?',
+                    choices: employeesArray
+                }
+            ])
+            .then((answer)=>{
+                console.log(answer)
+                let sql = `DELETE FROM employees WHERE employee_id = ${answer.removeEmployee}`
+                connection.query(sql, (err, res)=>{
+                    if(err){
+                        console.log(err)
+                    }
+                    console.log(res)
+                    viewAllEmployees()
+                })
+            })
+    })
 
 }
 
