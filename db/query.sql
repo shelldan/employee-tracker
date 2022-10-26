@@ -15,4 +15,4 @@ ON employees.role_id = roles.role_id
 LEFT JOIN departments
 ON roles.department_id = departments.department_id;
 
--- used for testing purpose, will not be used when running the program -- 
+-- used for testing purpose, it will not be used when running the program -- 
