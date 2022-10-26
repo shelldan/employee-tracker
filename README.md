@@ -37,7 +37,7 @@ SO THAT I can organize and plan my business
 ![](assets/screenshot-3.png)
 
 ## Video
-Check out the [walk-through video](https://drive.google.com/file/d/16irVHKnwhGI9ElGUJyabWoP_k2vuarCg/view?usp=sharing).
+Check out the [walk-through video](https://drive.google.com/file/d/1Nf76T-5lzRhY82wQ1yTtrhEgAozTH50C/view?usp=sharing).
 
 ## Installation
 To clone the repo:
