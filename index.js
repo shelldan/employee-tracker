@@ -124,7 +124,6 @@ addDepartment = () => {
                 if(err){
                     console.log(err);
                 }
-                //console.log(result)
                 viewAllDepartments();
                 
             })
@@ -136,13 +135,15 @@ addRole = () =>{
         if(err){
             console.log(err);
         }
+        console.log(res)
         departmentsArray = res.map(dept => (
             {
-                name: dept.department_id,
-                value: dept.department
+                name: dept.department,
+                value: dept.department_id
             }
+
         ))
-    
+        console.log(departmentsArray)
         return inquirer
             .prompt ([
                 {
@@ -156,7 +157,7 @@ addRole = () =>{
                     message: 'What is the salary of the role?'
                 },
                 {
-                    type: 'List',
+                    type: 'list',
                     name: 'selectDepartment',
                     message: 'Which department does the role belong to?',
                     choices: departmentsArray
@@ -164,10 +165,10 @@ addRole = () =>{
             ])
             .then((answer)=>{
                 let query = `INSERT INTO roles (title, department, salary)
-                            VALUES (${answer.newRole}, ${answer.newSalary}, ${answer.selectDepartment})
-                            FROM roles
-                            JOIN departments
-                            ON roles.department_id = departments.department_id`;
+                             VALUES (${answer.newRole}, ${answer.newSalary}, ${answer.selectDepartment})
+                             FROM roles
+                             JOIN departments
+                             ON roles.department_id = departments.department_id`;
                 // let newRole = {
                 //     newRole: answer.newRole,
                 //     newSalary: answer.newSalary,
@@ -177,7 +178,6 @@ addRole = () =>{
                     if(err){
                         console.log(err);
                     }
-                    //console.log(result)
                     viewAllRoles();
                 })
             })
