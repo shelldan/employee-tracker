@@ -182,6 +182,12 @@ addRole = () =>{
          * 
          * Looks like it is just inquirer assuming if you have a name field, then you would want that to display on choices, and if you have a value field then you would want that to be the value that is passed based off of your choice. If the the value field isn't there, then it selects the name of the thing that was selected, and again if neither are there, then the result is undefined.
          * 
+         * 
+         * legit resource: https://www.npmjs.com/package/inquirer
+         * Key the name property of the question object
+         * Value -> rawlist: select choice value (or name if no value specified)(string)
+         * 
+         * Alternatively, you might be use 'indexOf' to return the index value + 1
          */
         
         return inquirer
@@ -206,8 +212,8 @@ addRole = () =>{
             .then((answer)=>{
                 let query = `INSERT INTO roles (title, department_id, salary) VALUES (?, ?, ?)`
                 let params = [answer.newRole, answer.selectDepartment, answer.newSalary]
-                //console.log(params)
-                //console.log(answer.selectDepartment)
+                console.log(params)
+                console.log(answer.selectDepartment)// return 1
                 connection.query(query, params, (err, result) =>{
                     if(err){
                         console.log(err);
